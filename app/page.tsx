@@ -23,9 +23,9 @@ export default function HomePage() {
             className="w-full"
             size="lg"
             variant="outline"
-            onClick={() => router.push('/application/new')}
+            onClick={() => router.push('/approvals/login')}
           >
-            New Application
+           Approver Login
           </Button>
 
           
@@ -41,9 +41,9 @@ export default function HomePage() {
           <Button
             className="w-full"
             size="lg"
-            onClick={() => router.push('/approvals/login')}
+            onClick={() => router.push('/application/new')}
           >
-            Approver Login
+            New Application
           </Button>
         </CardContent>
       </Card>
