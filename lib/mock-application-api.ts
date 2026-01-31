@@ -145,6 +145,28 @@ const buildDecision = (salary: number | undefined) => {
   return { status: "allowed" as const, limit };
 };
 
+const resolveApplicationKey = (
+  store: Record<string, ApplicationRecord>,
+  id: string,
+) => {
+  const trimmedId = id.trim();
+  const normalizedId = trimmedId.toUpperCase();
+
+  if (store[normalizedId]) {
+    return normalizedId;
+  }
+
+  if (store[trimmedId]) {
+    return trimmedId;
+  }
+
+  if (store[id]) {
+    return id;
+  }
+
+  return null;
+};
+
 export const getMockApplication = async (
   id: string,
 ): Promise<ApplicationRecord | null> => {
@@ -153,9 +175,12 @@ export const getMockApplication = async (
   applicationStore = store;
   nextId = storedNextId;
 
-  const trimmedId = id.trim();
-  const normalizedId = trimmedId.toUpperCase();
-  return store[normalizedId] ?? store[trimmedId] ?? store[id] ?? null;
+  const resolvedKey = resolveApplicationKey(store, id);
+  if (!resolvedKey) {
+    return null;
+  }
+
+  return store[resolvedKey] ?? null;
 };
 
 export const createMockApplication = async (
@@ -183,4 +208,39 @@ export const createMockApplication = async (
   persistState(store, nextIdValue);
 
   return { applicationId, status, limit };
+};
+
+export const listMockApplications = async (): Promise<ApplicationRecord[]> => {
+  await wait(250);
+  const { store, nextId: storedNextId } = getStoredState();
+  applicationStore = store;
+  nextId = storedNextId;
+
+  return Object.values(store).sort((a, b) => a.id.localeCompare(b.id));
+};
+
+export const updateMockApplication = async (
+  id: string,
+  updates: Partial<Pick<ApplicationRecord, "status" | "limit">>,
+): Promise<ApplicationRecord | null> => {
+  await wait(350);
+  const { store, nextId: storedNextId } = getStoredState();
+  applicationStore = store;
+  nextId = storedNextId;
+
+  const resolvedKey = resolveApplicationKey(store, id);
+  if (!resolvedKey) {
+    return null;
+  }
+
+  const updated: ApplicationRecord = {
+    ...store[resolvedKey],
+    ...updates,
+  };
+
+  store[resolvedKey] = updated;
+  applicationStore = store;
+  persistState(store, nextId);
+
+  return updated;
 };

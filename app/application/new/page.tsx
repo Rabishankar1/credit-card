@@ -4,11 +4,7 @@ import * as React from "react";
 import { useForm } from "react-hook-form";
 
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogFooter } from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -24,6 +20,7 @@ import {
   CreateApplicationResponse,
 } from "@/lib/mock-application-api";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 const NewApplication = () => {
   const [dialogOpen, setDialogOpen] = React.useState(false);
@@ -51,10 +48,14 @@ const NewApplication = () => {
       return;
     }
 
-    const apiResponse = await createMockApplication(values);
-    setResponse(apiResponse);
-    setDialogOpen(true);
-    form.reset();
+    try {
+      const apiResponse = await createMockApplication(values);
+      setResponse(apiResponse);
+      setDialogOpen(true);
+      form.reset();
+    } catch (err) {
+      toast.error((err as Error).message);
+    }
   };
 
   const handleSendApplication = () => {
