@@ -3,72 +3,86 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-
-const VALID_EMAIL = 'abc@bank.com';
-const VALID_PASSWORD = 'approver123';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 export default function ApproverLoginPage() {
   const router = useRouter();
 
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleLogin = async () => {
+    setError('');
+    setLoading(true);
 
-    if (email === VALID_EMAIL && password === VALID_PASSWORD) {
-      setError('');
-      router.push('/approvals'); 
-    } else {
-      setError('Invalid email or password');
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.message);
+      }
+
+      router.push('/approvals');
+    } catch (err: any) {
+      setError(err.message || 'Login failed');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-muted">
       <Card className="w-full max-w-sm">
-        <CardHeader className="text-center">
-          <CardTitle>Bank Approver Login</CardTitle>
+        <CardHeader>
+          <CardTitle>Approver Login</CardTitle>
         </CardHeader>
 
-        <CardContent>
-          <form onSubmit={handleLogin} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="abc@bank.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
+        <CardContent className="space-y-4">
+          {error && (
+            <Alert variant="destructive">
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
 
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor="username">Username</Label>
+            <Input
+              id="username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder=""
+            />
+          </div>
 
-            {error && (
-              <p className="text-sm text-destructive text-center">
-                {error}
-              </p>
-            )}
+          <div className="space-y-2">
+            <Label htmlFor="password">Password</Label>
+            <Input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••"
+            />
+          </div>
 
-            <Button className="w-full" type="submit">
-              Login
-            </Button>
-          </form>
+          <Button
+            className="w-full"
+            onClick={handleLogin}
+            disabled={loading}
+          >
+            {loading ? 'Logging in...' : 'Login'}
+          </Button>
         </CardContent>
       </Card>
     </div>

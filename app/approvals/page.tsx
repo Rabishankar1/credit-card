@@ -1,14 +1,12 @@
 'use client';
 
-import { useState } from 'react';
-
+import { useEffect, useState } from 'react';
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-
 import {
   Table,
   TableBody,
@@ -17,11 +15,9 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-
 import {
   Dialog,
   DialogContent,
@@ -31,7 +27,6 @@ import {
 } from '@/components/ui/dialog';
 
 type ApplicationStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
-
 
 type Application = {
   applicationId: string;
@@ -43,41 +38,28 @@ type Application = {
   status: ApplicationStatus;
 };
 
-const initialApplications: Application[] = [
-  {
-    applicationId: 'APP-1001',
-    applicantName: 'Rahul Sharma',
-    pan: 'ABCDE1234F',
-    creditScore: 820,
-    income: 450000,
-    creditLimit: 1000000,
-    status: 'PENDING',
-  },
-  {
-    applicationId: 'APP-1002',
-    applicantName: 'Anita Verma',
-    pan: 'PQRSX9876K',
-    creditScore: 790,
-    income: 300000,
-    creditLimit: 75000,
-    status: 'PENDING',
-  },
-];
-
-export default function ApproverDashboard() {
-  const [applications, setApplications] = useState(initialApplications);
+export default function ApprovalsPage() {
+  const [applications, setApplications] = useState<Application[]>([]);
   const [approveAppId, setApproveAppId] = useState<string | null>(null);
   const [rejectAppId, setRejectAppId] = useState<string | null>(null);
   const [editedLimits, setEditedLimits] = useState<Record<string, number>>({});
+
+  useEffect(() => {
+    fetch('/api/approvals')
+      .then((res) => res.json())
+      .then(setApplications);
+  }, []);
 
   const confirmApprove = () => {
     setApplications((prev) =>
       prev.map((app) =>
         app.applicationId === approveAppId
-          ? { ...app, status: 'APPROVED',
+          ? {
+              ...app,
+              status: 'APPROVED',
               creditLimit:
-              editedLimits[app.applicationId] ?? app.creditLimit,
-           }
+                editedLimits[app.applicationId] ?? app.creditLimit,
+            }
           : app
       )
     );
@@ -99,7 +81,7 @@ export default function ApproverDashboard() {
     <div className="p-8">
       <Card>
         <CardHeader>
-          <CardTitle>Pending Credit Card Applications</CardTitle>
+          <CardTitle> Credit Card Applications</CardTitle>
         </CardHeader>
 
         <CardContent>
@@ -126,14 +108,14 @@ export default function ApproverDashboard() {
                   <TableCell>{app.creditScore}</TableCell>
                   <TableCell>{app.income.toLocaleString()}</TableCell>
 
-                  {/* Credit Limit */}
                   <TableCell>
                     {app.status === 'PENDING' && app.creditLimit > 500000 ? (
-                    <Input
+                      <Input
                         type="number"
                         className="w-32"
                         value={
-                          editedLimits[app.applicationId] ?? app.creditLimit
+                          editedLimits[app.applicationId] ??
+                          app.creditLimit
                         }
                         onChange={(e) =>
                           setEditedLimits((prev) => ({
@@ -141,15 +123,12 @@ export default function ApproverDashboard() {
                             [app.applicationId]: Number(e.target.value),
                           }))
                         }
-                    />
+                      />
                     ) : (
-                      <span className="text-muted-foreground">
-                        {app.creditLimit.toLocaleString()}
-                      </span>
+                      app.creditLimit.toLocaleString()
                     )}
                   </TableCell>
 
-                  {/* Status */}
                   <TableCell>
                     <Badge
                       variant={
@@ -164,7 +143,6 @@ export default function ApproverDashboard() {
                     </Badge>
                   </TableCell>
 
-                  {/* Actions */}
                   <TableCell>
                     {app.status === 'PENDING' && (
                       <div className="flex gap-2">
@@ -196,17 +174,12 @@ export default function ApproverDashboard() {
         </CardContent>
       </Card>
 
-      {/* Approve Popup */}
+      {/* Approve Dialog */}
       <Dialog open={!!approveAppId} onOpenChange={() => setApproveAppId(null)}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Approve Application?</DialogTitle>
           </DialogHeader>
-
-          <p className="text-sm text-muted-foreground">
-            Are you sure you want to approve this credit card application?
-          </p>
-
           <DialogFooter>
             <Button
               variant="outline"
@@ -221,17 +194,12 @@ export default function ApproverDashboard() {
         </DialogContent>
       </Dialog>
 
-      {/* Reject Popup */}
+      {/* Reject Dialog */}
       <Dialog open={!!rejectAppId} onOpenChange={() => setRejectAppId(null)}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Reject Application?</DialogTitle>
           </DialogHeader>
-
-          <p className="text-sm text-muted-foreground">
-            This action cannot be undone.
-          </p>
-
           <DialogFooter>
             <Button
               variant="outline"
