@@ -81,7 +81,7 @@ export default function ApplicationViewPage() {
     (async () => {
       try {
         setLoading(true);
-        const res = await fetch(`${process.env.BASE_URL}/api/v1/application/${applicationId}`, {
+        const res = await fetch(`${process.env.BASE_URL}/api/v1/users/application/${applicationId}`, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' }
       })

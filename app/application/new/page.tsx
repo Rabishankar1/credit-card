@@ -49,8 +49,8 @@ const NewApplication = () => {
       const apiBaseUrl =
         process.env.NEXT_PUBLIC_BASE_URL?.trim() || "";
       const apiUrl = apiBaseUrl
-        ? `${apiBaseUrl}/api/application`
-        : "/api/application";
+        ? `${apiBaseUrl}/api/users/application`
+        : "/api/users/application";
       const apiResponse = await fetch(apiUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
