@@ -22,7 +22,7 @@ import { toast } from "sonner";
 const NewApplication = () => {
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const [response, setResponse] =
-    React.useState<CreateApplicationResponse | null>(null);
+    React.useState<any | null>(null);
   const router = useRouter();
 
   const form = useForm<applicationType>({
@@ -47,9 +47,9 @@ const NewApplication = () => {
 
     try {
       const apiBaseUrl =
-        process.env.NEXT_PUBLIC_BASE_URL?.trim() || "";
+        process.env.BASE_URL?.trim() || "";
       const apiUrl = apiBaseUrl
-        ? `${apiBaseUrl}/api/users/application`
+        ? `${apiBaseUrl}/api/v1/users/checkEligibility`
         : "/api/users/application";
       const apiResponse = await fetch(apiUrl, {
         method: "POST",
@@ -67,7 +67,30 @@ const NewApplication = () => {
 
   const handleSendApplication = () => {
     setDialogOpen(false);
-    if (response?.applicationId) {
+    if (response?.status=== 'APPROVED') {
+
+
+      const values = form.getValues()
+      try {
+      const apiBaseUrl =
+        process.env.BASE_URL?.trim() || "";
+      const apiUrl = apiBaseUrl
+        ? `${apiBaseUrl}/api/v1/users/application`
+        : "/api/users/application";
+      const apiResponse = await fetch(apiUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(values),
+      });
+      const data = await apiResponse.json();
+      setResponse(data);
+      setDialogOpen(true);
+      form.reset();
+    } catch (err) {
+      toast.error((err as Error).message);
+    }
+  };
+
       router.push(`/application/${response.applicationId}`);
     }
   };
