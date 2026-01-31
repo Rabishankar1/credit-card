@@ -1,9 +1,240 @@
-import React from 'react'
+'use client';
 
-const page = () => {
+import { useState } from 'react';
+
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+
+type ApplicationStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
+
+type Application = {
+  applicationId: string;
+  applicantName: string;
+  pan: string;
+  creditScore: number;
+  income: number;
+  creditLimit: number;
+  status: ApplicationStatus;
+};
+
+const initialApplications: Application[] = [
+  {
+    applicationId: 'APP-1001',
+    applicantName: 'Rahul Sharma',
+    pan: 'ABCDE1234F',
+    creditScore: 820,
+    income: 450000,
+    creditLimit: 1000000,
+    status: 'PENDING',
+  },
+  {
+    applicationId: 'APP-1002',
+    applicantName: 'Anita Verma',
+    pan: 'PQRSX9876K',
+    creditScore: 790,
+    income: 300000,
+    creditLimit: 75000,
+    status: 'PENDING',
+  },
+];
+
+export default function ApproverDashboard() {
+  const [applications, setApplications] = useState(initialApplications);
+  const [approveAppId, setApproveAppId] = useState<string | null>(null);
+  const [rejectAppId, setRejectAppId] = useState<string | null>(null);
+
+  const confirmApprove = () => {
+    setApplications((prev) =>
+      prev.map((app) =>
+        app.applicationId === approveAppId
+          ? { ...app, status: 'APPROVED' }
+          : app
+      )
+    );
+    setApproveAppId(null);
+  };
+
+  const confirmReject = () => {
+    setApplications((prev) =>
+      prev.map((app) =>
+        app.applicationId === rejectAppId
+          ? { ...app, status: 'REJECTED' }
+          : app
+      )
+    );
+    setRejectAppId(null);
+  };
+
   return (
-    <div>page</div>
-  )
-}
+    <div className="p-8">
+      <Card>
+        <CardHeader>
+          <CardTitle>Pending Credit Card Applications</CardTitle>
+        </CardHeader>
 
-export default page
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Application ID</TableHead>
+                <TableHead>Applicant</TableHead>
+                <TableHead>PAN</TableHead>
+                <TableHead>Credit Score</TableHead>
+                <TableHead>Income (₹)</TableHead>
+                <TableHead>Credit Limit (₹)</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Action</TableHead>
+              </TableRow>
+            </TableHeader>
+
+            <TableBody>
+              {applications.map((app) => (
+                <TableRow key={app.applicationId}>
+                  <TableCell>{app.applicationId}</TableCell>
+                  <TableCell>{app.applicantName}</TableCell>
+                  <TableCell>****{app.pan.slice(-4)}</TableCell>
+                  <TableCell>{app.creditScore}</TableCell>
+                  <TableCell>{app.income.toLocaleString()}</TableCell>
+
+                  {/* Credit Limit */}
+                  <TableCell>
+                    {app.status === 'PENDING' && app.creditLimit > 500000 ? (
+                      <Input
+                        type="number"
+                        defaultValue={app.creditLimit}
+                        className="w-32"
+                      />
+                    ) : (
+                      <span className="text-muted-foreground">
+                        {app.creditLimit.toLocaleString()}
+                      </span>
+                    )}
+                  </TableCell>
+
+                  {/* Status */}
+                  <TableCell>
+                    <Badge
+                      variant={
+                        app.status === 'APPROVED'
+                          ? 'default'
+                          : app.status === 'REJECTED'
+                          ? 'destructive'
+                          : 'secondary'
+                      }
+                    >
+                      {app.status}
+                    </Badge>
+                  </TableCell>
+
+                  {/* Actions */}
+                  <TableCell>
+                    {app.status === 'PENDING' && (
+                      <div className="flex gap-2">
+                        <Button
+                          size="sm"
+                          onClick={() =>
+                            setApproveAppId(app.applicationId)
+                          }
+                        >
+                          Approve
+                        </Button>
+
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={() =>
+                            setRejectAppId(app.applicationId)
+                          }
+                        >
+                          Reject
+                        </Button>
+                      </div>
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+
+      {/* Approve Popup */}
+      <Dialog open={!!approveAppId} onOpenChange={() => setApproveAppId(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Approve Application?</DialogTitle>
+          </DialogHeader>
+
+          <p className="text-sm text-muted-foreground">
+            Are you sure you want to approve this credit card application?
+          </p>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setApproveAppId(null)}
+            >
+              Cancel
+            </Button>
+            <Button onClick={confirmApprove}>
+              Confirm Approve
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Reject Popup */}
+      <Dialog open={!!rejectAppId} onOpenChange={() => setRejectAppId(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Reject Application?</DialogTitle>
+          </DialogHeader>
+
+          <p className="text-sm text-muted-foreground">
+            This action cannot be undone.
+          </p>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setRejectAppId(null)}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={confirmReject}
+            >
+              Confirm Reject
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
