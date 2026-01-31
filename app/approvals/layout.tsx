@@ -1,6 +1,7 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
+import { IconHomeFilled } from "@tabler/icons-react";
 
 export default function ApprovalsLayout({
   children,
@@ -14,7 +15,23 @@ export default function ApprovalsLayout({
       <div
         style={{
           display: "flex",
-          justifyContent: "flex-end",
+          justifyContent: "flex-start",
+          gap: 4,
+          padding: 16,
+          backgroundColor: "#80808030",
+        }}
+      >
+        <IconHomeFilled
+          onClick={() => router.push("/")}
+          size={30}
+          className="cursor-pointer"
+        />
+      </div>
+
+      {/* <div
+        style={{
+          display: "flex",
+          justifyContent: "flex-start",
           gap: 4,
           padding: 16,
         }}
@@ -25,7 +42,8 @@ export default function ApprovalsLayout({
         <Button onClick={() => router.push("/application/login")}>
           Customer Login
         </Button>
-      </div>
+        <IconHomeFilled onClick={() => router.push("/")}/>
+      </div> */}
       {children}
     </section>
   );
