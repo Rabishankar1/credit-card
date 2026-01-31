@@ -15,10 +15,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { applicationType } from "@/lib/types/application";
-import {
-  createMockApplication,
-  CreateApplicationResponse,
-} from "@/lib/mock-application-api";
+import { CreateApplicationResponse } from "@/lib/mock-application-api";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
@@ -49,12 +46,17 @@ const NewApplication = () => {
     }
 
     try {
-      const apiResponse =await fetch(`${process.env.BASE_URL}/api/v1/application`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body:values
-      })
-      const data = await apiResponse.json()
+      const apiBaseUrl =
+        process.env.NEXT_PUBLIC_BASE_URL?.trim() || "";
+      const apiUrl = apiBaseUrl
+        ? `${apiBaseUrl}/api/application`
+        : "/api/application";
+      const apiResponse = await fetch(apiUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(values),
+      });
+      const data = await apiResponse.json();
       setResponse(data);
       setDialogOpen(true);
       form.reset();
