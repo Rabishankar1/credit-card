@@ -49,8 +49,13 @@ const NewApplication = () => {
     }
 
     try {
-      const apiResponse = await createMockApplication(values);
-      setResponse(apiResponse);
+      const apiResponse =await fetch(`${process.env.BASE_URL}/api/v1/application`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:values
+      })
+      const data = await apiResponse.json()
+      setResponse(data);
       setDialogOpen(true);
       form.reset();
     } catch (err) {

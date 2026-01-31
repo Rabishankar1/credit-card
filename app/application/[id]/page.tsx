@@ -81,7 +81,11 @@ export default function ApplicationViewPage() {
     (async () => {
       try {
         setLoading(true);
-        const data = await getMockApplication(applicationId);
+        const res = await fetch(`${process.env.BASE_URL}/api/v1/application/${applicationId}`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
+      })
+      const data = await res.json()
         if (!isMounted) {
           return;
         }
