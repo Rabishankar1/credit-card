@@ -32,6 +32,7 @@ import {
 
 type ApplicationStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
 
+
 type Application = {
   applicationId: string;
   applicantName: string;
