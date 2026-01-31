@@ -12,6 +12,7 @@ import {
   getMockApplication,
 } from "@/lib/mock-application-api";
 import { useParams } from "next/navigation";
+import { toast } from "sonner";
 
 const formatCurrency = (value: number | undefined) => {
   if (value === undefined || Number.isNaN(value)) {
@@ -76,16 +77,21 @@ export default function ApplicationViewPage() {
 
   useEffect(() => {
     let isMounted = true;
-    setLoading(true);
 
-    getMockApplication(applicationId).then((data) => {
-      if (!isMounted) {
-        return;
+    (async () => {
+      try {
+        setLoading(true);
+        const data = await getMockApplication(applicationId);
+        if (!isMounted) {
+          return;
+        }
+
+        setApplication(data);
+        setLoading(false);
+      } catch (err) {
+        toast.error((err as Error)?.message);
       }
-
-      setApplication(data);
-      setLoading(false);
-    });
+    })();
 
     return () => {
       isMounted = false;
@@ -118,7 +124,7 @@ export default function ApplicationViewPage() {
       <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-6 py-10">
         <div className="space-y-2">
           <h1 className="text-2xl font-semibold text-foreground">
-            Application not found     
+            Application not found
           </h1>
           <p className="text-sm text-muted-foreground">
             We could not find an application with ID "{applicationId}".

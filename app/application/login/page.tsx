@@ -1,12 +1,12 @@
-"use client"
+"use client";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import React, { useState } from "react";
+import { useState } from "react";
 import { redirect, RedirectType } from "next/navigation";
 import { Card } from "@/components/ui/card";
 
-const page = () => {
+const Login = () => {
   const [id, setId] = useState("");
   return (
     <div className="w-full h-full min-h-screen flex justify-center align-center">
@@ -25,4 +25,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Login;
