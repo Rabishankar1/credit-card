@@ -7,10 +7,7 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
-  DialogHeader,
-  DialogTitle,
 } from "@/components/ui/dialog";
 import {
   Form,
@@ -21,52 +18,20 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useState } from "react";
-
-type FormValues = {
-  name: string;
-  email: string;
-  phone: number | undefined;
-  salary: number | undefined;
-  pan: string;
-  dateOfBirth: string;
-};
-
-type ApiPayload = {
-  name: string;
-  email: string;
-  phone: number;
-  salary: number;
-  pan: string;
-  dateOfBirth: Date;
-};
-
-type CheckEligibilityApiResponse = {
-  status: "allowed" | "rejected";
-  limit: number;
-};
-
-const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-
-const mockPostApplication = async (
-  payload: ApiPayload,
-): Promise<CheckEligibilityApiResponse> => {
-  await wait(650);
-
-  return {
-    status: "allowed",
-    limit: 75000,
-  };
-};
+import { applicationType } from "@/lib/types/application";
+import {
+  createMockApplication,
+  CreateApplicationResponse,
+} from "@/lib/mock-application-api";
+import { useRouter } from "next/navigation";
 
 const NewApplication = () => {
   const [dialogOpen, setDialogOpen] = React.useState(false);
-  const [response, setResponse] = useState<CheckEligibilityApiResponse | null>(
-    null,
-  );
+  const [response, setResponse] =
+    React.useState<CreateApplicationResponse | null>(null);
+  const router = useRouter();
 
-  const form = useForm<FormValues>({
+  const form = useForm<applicationType>({
     defaultValues: {
       name: "",
       email: "",
@@ -77,31 +42,26 @@ const NewApplication = () => {
     },
   });
 
-  const onSubmit = async (values: FormValues) => {
-    const phone = values.phone ?? Number.NaN;
-    const salary = values.salary ?? Number.NaN;
-
-    if (!values.dateOfBirth || Number.isNaN(phone) || Number.isNaN(salary)) {
+  const onSubmit = async (values: applicationType) => {
+    if (
+      !values.dateOfBirth ||
+      values.phone === undefined ||
+      values.salary === undefined
+    ) {
       return;
     }
 
-    const payload: ApiPayload = {
-      name: values.name,
-      email: values.email,
-      phone,
-      salary,
-      pan: values.pan,
-      dateOfBirth: new Date(values.dateOfBirth),
-    };
-
-    const apiResponse = await mockPostApplication(payload);
+    const apiResponse = await createMockApplication(values);
     setResponse(apiResponse);
     setDialogOpen(true);
     form.reset();
   };
 
-  const handleSendApplication = async () => {
+  const handleSendApplication = () => {
     setDialogOpen(false);
+    if (response?.applicationId) {
+      router.push(`/application/${response.applicationId}`);
+    }
   };
 
   return (
@@ -274,14 +234,18 @@ const NewApplication = () => {
 
           {response ? (
             response.status === "rejected" ? (
-              <div>Sorry, This product can not be processed at this time.</div>
+              <div className="flex flex-col gap-2">
+                <div>Sorry, this product cannot be processed at this time.</div>
+                <div className="text-sm text-muted-foreground">
+                  Application ID: {response.applicationId}
+                </div>
+              </div>
             ) : (
               <div className="flex flex-col gap-2">
-                Your approved limit is: {response.limit}{" "}
-                {response?.limit ||
-                  (0 > 500000 && (
-                    <div>{`( Credit Limit is greater than 1000000 )`}</div>
-                  ))}
+                <div>Your approved limit is: INR {response.limit}</div>
+                <div className="text-sm text-muted-foreground">
+                  Application ID: {response.applicationId}
+                </div>
               </div>
             )
           ) : (
@@ -301,8 +265,12 @@ const NewApplication = () => {
           </div> */}
 
           <DialogFooter>
-            <Button type="button" onClick={handleSendApplication}>
-              Send Application
+            <Button
+              type="button"
+              onClick={handleSendApplication}
+              disabled={!response}
+            >
+              {response ? "Redirect to application" : "Close"}
             </Button>
           </DialogFooter>
         </DialogContent>
