@@ -8,7 +8,7 @@ export async function GET() {
       pan: 'ABCDE1234F',
       creditScore: 820,
       income: 450000,
-      creditLimit: 1000000,
+      creditLimit: 100000,
       status: 'PENDING',
     },
     {
