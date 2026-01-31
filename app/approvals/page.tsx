@@ -68,12 +68,16 @@ export default function ApproverDashboard() {
   const [applications, setApplications] = useState(initialApplications);
   const [approveAppId, setApproveAppId] = useState<string | null>(null);
   const [rejectAppId, setRejectAppId] = useState<string | null>(null);
+  const [editedLimits, setEditedLimits] = useState<Record<string, number>>({});
 
   const confirmApprove = () => {
     setApplications((prev) =>
       prev.map((app) =>
         app.applicationId === approveAppId
-          ? { ...app, status: 'APPROVED' }
+          ? { ...app, status: 'APPROVED',
+              creditLimit:
+              editedLimits[app.applicationId] ?? app.creditLimit,
+           }
           : app
       )
     );
@@ -125,11 +129,19 @@ export default function ApproverDashboard() {
                   {/* Credit Limit */}
                   <TableCell>
                     {app.status === 'PENDING' && app.creditLimit > 500000 ? (
-                      <Input
+                    <Input
                         type="number"
-                        defaultValue={app.creditLimit}
                         className="w-32"
-                      />
+                        value={
+                          editedLimits[app.applicationId] ?? app.creditLimit
+                        }
+                        onChange={(e) =>
+                          setEditedLimits((prev) => ({
+                            ...prev,
+                            [app.applicationId]: Number(e.target.value),
+                          }))
+                        }
+                    />
                     ) : (
                       <span className="text-muted-foreground">
                         {app.creditLimit.toLocaleString()}

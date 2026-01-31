@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 
-const VALID_EMAIL = 'approver@bank.com';
+const VALID_EMAIL = 'abc@bank.com';
 const VALID_PASSWORD = 'approver123';
 
 export default function ApproverLoginPage() {
@@ -42,7 +42,7 @@ export default function ApproverLoginPage() {
               <Input
                 id="email"
                 type="email"
-                placeholder="approver@bank.com"
+                placeholder="abc@bank.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
