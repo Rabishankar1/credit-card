@@ -46,9 +46,7 @@ const NewApplication = () => {
 
     try {
       const apiBaseUrl = process.env.BASE_URL?.trim() || "";
-      const apiUrl = apiBaseUrl
-        ? `${apiBaseUrl}/api/v1/users/checkEligibility`
-        : "/api/users/application";
+      const apiUrl = `${apiBaseUrl}/api/v1/users/checkEligibility`;
       const apiResponse = await fetch(apiUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -69,9 +67,7 @@ const NewApplication = () => {
       const values = form.getValues();
       try {
         const apiBaseUrl = process.env.BASE_URL?.trim() || "";
-        const apiUrl = apiBaseUrl
-          ? `${apiBaseUrl}/api/v1/users/application`
-          : "/api/users/application";
+        const apiUrl = `${apiBaseUrl}/api/v1/users/application`;
         const apiResponse = await fetch(apiUrl, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
