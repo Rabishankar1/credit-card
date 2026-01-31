@@ -45,7 +45,7 @@ export default function ApprovalsPage() {
   const [editedLimits, setEditedLimits] = useState<Record<string, number>>({});
 
   useEffect(() => {
-    await fetch(`${process.env.BASE_URL}/api/v1/approver/applications`)
+    fetch(`${process.env.BASE_URL}/api/v1/approver/applications`)
       .then((res) => res.json())
       .then(setApplications);
   }, []);
