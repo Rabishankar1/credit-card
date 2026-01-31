@@ -24,7 +24,11 @@ export default function ApplicationLayout({
         {/* <Button onClick={() => router.push("/approvals/login")}>
           Approval login
         </Button> */}
-        <IconHomeFilled onClick={() => router.push("/")} size={30} />
+        <IconHomeFilled
+          onClick={() => router.push("/")}
+          size={30}
+          className="cursor-pointer"
+        />
       </div>
       {children}
     </section>

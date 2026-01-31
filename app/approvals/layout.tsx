@@ -21,7 +21,11 @@ export default function ApprovalsLayout({
           backgroundColor: "#80808030",
         }}
       >
-        <IconHomeFilled onClick={() => router.push("/")} size={30} />
+        <IconHomeFilled
+          onClick={() => router.push("/")}
+          size={30}
+          className="cursor-pointer"
+        />
       </div>
 
       {/* <div
