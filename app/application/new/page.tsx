@@ -280,7 +280,7 @@ const NewApplication = () => {
                 Your approved limit is: {response.limit}{" "}
                 {response?.limit ||
                   (0 > 500000 && (
-                    <div>{`( Credit Limit is greater than 100000 )`}</div>
+                    <div>{`( Credit Limit is greater than 1000000 )`}</div>
                   ))}
               </div>
             )
